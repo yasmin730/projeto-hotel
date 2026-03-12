@@ -29,6 +29,17 @@ COLUMNS = [
      "Data Cadastro",
 ]
 
+def init_excel():
+      if not os.path.exists(DB_DIR):
+          os.makedrs(DB_DIR) #cria uma nova planilha Excel
+      if not os.path.exists(EXCEL_FILE):
+          worbook = openpyxl.worbook()
+          sheet = worbook.active
+          sheet.title = "Clientes"
+          sheet.append(COLUMNS)
+          worbook.save(EXCEL_FILE)     
+              
+
 app = Flask(__name__, static_folder=STATIC_DIR,static_url_path="/" + STATIC_DIR)
 
 @app.route("/")
