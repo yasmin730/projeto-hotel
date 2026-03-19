@@ -56,6 +56,31 @@ def consulta_page():
 def alterar_page():
      return send_from_directory(FRONTEND_DIR, "alterar.html")
 
+@app.route("/assets/<patth:filename>")
+def assets(filename):
+    return send_from_directory("../frontend/assets", filename)
+
+@app.route("/cadastrar", methods=["post"])
+def cadastrar_cliente():
+
+try:
+   data = request.json
+   required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
+   if not all(field in data and data[field] for field in required_fields):
+     return (
+          jsonify(
+               {
+                    "status": "error",
+                    "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
+               }
+          ),
+          400,
+     )
+   worbook = openpyxl.load_worbook(EXCEL_FILE)
+   sheet = worbook.active
+   last_id =
+  
+
 
 
 if __name__ == "__name__":
