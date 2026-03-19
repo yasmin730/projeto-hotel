@@ -78,7 +78,42 @@ try:
      )
    worbook = openpyxl.load_worbook(EXCEL_FILE)
    sheet = worbook.active
-   last_id =
+   last_id = 0
+   if sheet.max_row > 1:
+     last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
+   new_id = last_id + 1
+
+   novo_cliente = [
+     new_id,
+     data.get("nome"),
+     data.get("cpf"),
+     data.get("email"),
+     data.get("telefone"),
+     data.get("endereco"),
+     data.get("observacoes", "")
+     datetime.now().strftime("%Y-%m-%d"),
+   ]  
+
+   sheet.append(novo_cliente)
+   worbook.save(EXCEL_FILE)
+
+   return (
+     jsonify(
+          {
+               "status": "sucess",
+               "mensage": "clientes cadastrado com sucesso!",
+               "id": new_id,
+          }
+     ),
+     201,
+   )
+   except Exception as e:
+     return(
+          jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"})
+          500,
+     )
+
+
   
 
 
