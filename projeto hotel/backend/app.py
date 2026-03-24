@@ -1,5 +1,11 @@
 import os
-from flask import Flask, send_from_directory
+from flask import (
+  flask,
+  request,
+  jsonify,
+  send_from_directory,
+)
+
 import openpyxl # biblioteca para ler e escrever planilhas no Excel
 from datetime import (
      datetime,
@@ -63,36 +69,37 @@ def assets(filename):
 @app.route("/cadastrar", methods=["post"])
 def cadastrar_cliente():
 
- try:
-   data = request.json
-   required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
-   if not all(field in data and data[field] for field in required_fields):
-     return (
-          jsonify(
-               {
-                    "status": "error",
-                    "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
-               }
-          ),
-          400,
-     )
-   worbook = openpyxl.load_worbook(EXCEL_FILE)
-   sheet = worbook.active
-   last_id = 0
-   if sheet.max_row > 1:
-     last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
-   new_id = last_id + 1
+     try:
+          data = request.json
+          required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
+          if not all(field in data and data[field] for field in required_fields):
+             return (
+                 jsonify(
+                     {
+                         "status": "error",
+                         "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
+                   }
+               ),
+               400,
+          )
+          worbook = openpyxl.load_worbook(EXCEL_FILE)
+          sheet = worbook.active
 
-   novo_cliente = [
-     new_id,
-     data.get("nome"),
-     data.get("cpf"),
-     data.get("email"),
-     data.get("telefone"),
-     data.get("endereco"),
-     data.get("observacoes", ""),
-     datetime.now().strftime("%Y-%m-%d"),
-   ]  
+          last_id = 0
+          if sheet.max_row > 1:
+               last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
+          new_id = last_id + 1
+
+          novo_cliente = [
+             new_id,
+             data.get("nome"),
+             data.get("cpf"),
+             data.get("email"),
+             data.get("telefone"),
+             data.get("endereco"),
+             data.get("observacoes", ""),
+            datetime.now().strftime("%Y-%m-%d"),
+          ]  
 
    sheet.append(novo_cliente)
    worbook.save(EXCEL_FILE)
@@ -107,12 +114,12 @@ def cadastrar_cliente():
      ),
      201,
    )
- except Exception as e:
+except Exception as e:
   return(
      jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"})
       500, 
 
-  )
+  )  
 
 
   
