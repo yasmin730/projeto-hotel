@@ -63,7 +63,7 @@ def assets(filename):
 @app.route("/cadastrar", methods=["post"])
 def cadastrar_cliente():
 
-try:
+ try:
    data = request.json
    required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
    if not all(field in data and data[field] for field in required_fields):
@@ -90,7 +90,7 @@ try:
      data.get("email"),
      data.get("telefone"),
      data.get("endereco"),
-     data.get("observacoes", "")
+     data.get("observacoes", ""),
      datetime.now().strftime("%Y-%m-%d"),
    ]  
 
@@ -107,11 +107,12 @@ try:
      ),
      201,
    )
-   except Exception as e:
-     return(
-          jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"})
-          500,
-     )
+ except Exception as e:
+  return(
+     jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"})
+      500, 
+
+  )
 
 
   
