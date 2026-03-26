@@ -1,5 +1,11 @@
 import os
-from flask import Flask, send_from_directory
+from flask import (
+  Flask,
+  request,
+  jsonify,
+  send_from_directory,
+)
+
 import openpyxl # biblioteca para ler e escrever planilhas no Excel
 from datetime import (
      datetime,
@@ -55,6 +61,106 @@ def consulta_page():
 @app.route("/alterar")
 def alterar_page():
      return send_from_directory(FRONTEND_DIR, "alterar.html")
+
+@app.route("/assets/<path:filename>")
+def assets(filename):
+    return send_from_directory("../frontend/assets", filename)
+
+@app.route("/cadastrar", methods=["post"])
+def cadastrar_cliente():
+
+     try:
+          data = request.json
+          required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
+          if not all(field in data and data[field] for field in required_fields):
+             return (
+                 jsonify(
+                     {
+                         "status": "error",
+                         "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
+                   }
+               ),
+               400,
+          )
+          worbook = openpyxl.load_worbook(EXCEL_FILE)
+          sheet = worbook.active
+
+          last_id = 0
+          if sheet.max_row > 1:
+               last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
+          new_id = last_id + 1
+
+          novo_cliente = [
+             new_id,
+             data.get("nome"),
+             data.get("cpf"),
+             data.get("email"),
+             data.get("telefone"),
+             data.get("endereco"),
+             data.get("observacoes", ""),
+            datetime.now().strftime("%Y-%m-%d"),
+          ]  
+
+          sheet.append(novo_cliente)
+          worbook.save(EXCEL_FILE)
+
+          return (
+                jsonify(
+                     {
+                        "status": "sucess",
+                       "mensage": "clientes cadastrado com sucesso!",
+                       "id": new_id,
+                    }
+               ),
+              201,
+          )
+
+     except Exception as e:
+           return(
+              jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"}),
+              500, 
+          )  
+
+
+
+
+@app.route("/api/buscar", methods=["GET"])
+def buscar_clientes():
+    """
+    Busca clientes pelo nome (não diferencia maiúsculas/minúsculas).
+    """
+    nome_query = request.args.get("nome", "").lower()  # 🔤 Nome pesquisado
+
+    try:
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
+        sheet = workbook.active
+        resultados = []  # 🧺 Lista para armazenar resultados
+
+        # 🧭 Percorre todas as linhas (ignorando o cabeçalho)
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            cliente = dict(zip(COLUMNS, row))  # Converte linha → dicionário
+            nome_cliente = (cliente.get("Nome") or "").lower()
+
+            if nome_query in nome_cliente:
+                resultados.append(cliente)
+
+        return jsonify(resultados)  # 🔙 Retorna lista de clientes encontrados
+
+    except FileNotFoundError:
+        return (
+            jsonify({"status": "error", "message": "Arquivo de dados não encontrado."}),
+            404,
+        )
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Erro ao ler os dados: {e}"}),
+            500,
+        )
+
+
+
+
+  
 
 
 

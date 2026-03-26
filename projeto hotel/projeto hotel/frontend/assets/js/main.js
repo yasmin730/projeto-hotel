@@ -26,7 +26,7 @@ Document.addEventListener("DOMContentLoaded", function () {
 
                 const result = await resp.json();
 
-                document.getElementById('mensagem').innerText = result.menssage;
+                this.document.getElementById('mensagem').innerText = result.menssage;
 
                 formCadastro.requestFullscreen();
             } catch (err){
