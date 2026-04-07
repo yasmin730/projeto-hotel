@@ -1,6 +1,6 @@
 import os
 from flask import (
-  flask,
+  Flask,
   request,
   jsonify,
   send_from_directory,
@@ -62,7 +62,7 @@ def consulta_page():
 def alterar_page():
      return send_from_directory(FRONTEND_DIR, "alterar.html")
 
-@app.route("/assets/<patth:filename>")
+@app.route("/assets/<path:filename>")
 def assets(filename):
     return send_from_directory("../frontend/assets", filename)
 
@@ -101,25 +101,63 @@ def cadastrar_cliente():
             datetime.now().strftime("%Y-%m-%d"),
           ]  
 
-   sheet.append(novo_cliente)
-   worbook.save(EXCEL_FILE)
+          sheet.append(novo_cliente)
+          worbook.save(EXCEL_FILE)
 
-   return (
-     jsonify(
-          {
-               "status": "sucess",
-               "mensage": "clientes cadastrado com sucesso!",
-               "id": new_id,
-          }
-     ),
-     201,
-   )
-except Exception as e:
-  return(
-     jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"})
-      500, 
+          return (
+                jsonify(
+                     {
+                        "status": "sucess",
+                       "mensage": "clientes cadastrado com sucesso!",
+                       "id": new_id,
+                    }
+               ),
+              201,
+          )
 
-  )  
+     except Exception as e:
+           return(
+              jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"}),
+              500, 
+          )  
+
+
+
+
+@app.route("/api/buscar", methods=["GET"])
+def buscar_clientes():
+    """
+    Busca clientes pelo nome (não diferencia maiúsculas/minúsculas).
+    """
+    nome_query = request.args.get("nome", "").lower()  # 🔤 Nome pesquisado
+
+    try:
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
+        sheet = workbook.active
+        resultados = []  # 🧺 Lista para armazenar resultados
+
+        # 🧭 Percorre todas as linhas (ignorando o cabeçalho)
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            cliente = dict(zip(COLUMNS, row))  # Converte linha → dicionário
+            nome_cliente = (cliente.get("Nome") or "").lower()
+
+            if nome_query in nome_cliente:
+                resultados.append(cliente)
+
+        return jsonify(resultados)  # 🔙 Retorna lista de clientes encontrados
+
+    except FileNotFoundError:
+        return (
+            jsonify({"status": "error", "message": "Arquivo de dados não encontrado."}),
+            404,
+        )
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Erro ao ler os dados: {e}"}),
+            500,
+        )
+
+
 
 
   

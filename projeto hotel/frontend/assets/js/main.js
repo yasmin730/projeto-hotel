@@ -1,4 +1,3 @@
-
 // Aqui estamos dizendo:
 // "espere o html carregar completamente antes de executar o JavaScrippt"
 Document.addEventListener("DOMContentLoaded", function () {
@@ -12,9 +11,9 @@ Document.addEventListener("DOMContentLoaded", function () {
 
     
 
-           // Agoa estamos dizendo:
-          // "quando o formulário for enviado (botão Enviar clicado)..."
-          formCadastro.addEventListener("submit", async (e) =>{
+        // Agoa estamos dizendo:
+        // "quando o formulário for enviado (botão Enviar clicado)..."
+        formCadastro.addEventListener("submit", async (e) =>{
 
             try{
 
@@ -59,4 +58,7 @@ Document.addEventListener("DOMContentLoaded", function () {
           console.log(dados);
         });
     }
+    
+
+
 });

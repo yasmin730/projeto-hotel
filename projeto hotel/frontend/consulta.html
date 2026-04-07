@@ -1,0 +1,34 @@
+<!DOCTYPE html>                    <!--DIZ AO COMPILADOR QUE É UM ARQUIVO HTML5-->
+<html lang="pt-br">                
+<head>                             
+    <meta charset="UTF-8">         
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!--RESPONSABILIDADE DO SITE-->
+    <title>consulta de clientes</title>
+    
+</head>
+<body>
+   <div>
+        <h2>🔍 Consulta de Clientes</h2>
+        <div>
+            <input type="text" id="campoBusca" placeholder="digite o nome do cliente">
+            <button id="btnBuscar">Buscar</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                   <th>ID</th>
+                   <th>Nome</th>
+                   <th>CPF</th>
+                   <th>Email</th>
+                   <th>Telefone</th>
+                   <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaResultados"></tbody>
+        </table>
+   </div>
+<script src="assets/js/main.js"></script>
+
+</body>
+</html>
