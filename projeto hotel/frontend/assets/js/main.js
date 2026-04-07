@@ -59,6 +59,34 @@ Document.addEventListener("DOMContentLoaded", function () {
         });
     }
     
+    if (btnBuscar) {
+        btnBuscar.addEventListener('click', async () => {
+            //pega o nome digitado pelo usuario
+            const nome= document.getElementById('campoBusca').value;
+            //🚀 faz uma requisição GET ao Flask, enviando o nome como parâmetro
+            const resp = await fetch(`/bucar?nome=${nome}`);
+            const clientes = await resp.json(); //🕹️ recebe lista de clientes
+
+            const tabela = document.getElementById('tabelaResultados');
+            tabela.innerHTML = ''; //Limpa a tabela antes de exibir os novos resultados
+
+            // Para cada clientes retornado, cria uma nova linha na tabela HTML
+            clientes.forEach(cli => {
+               const row =`
+               <tr>
+                <td>${cli.ID}</td>
+                <td>${cli.Nome}</td>
+                <td>${cli.CPF}</td>
+                <td>${cli.Email}</td>
+                <td>${cli.Telefone}</td>
+                <td><ahref="/alterar?id=${cli.ID}" class="bnt bnt-sm bnt-warning"> Editar</a></td>
+               </tr>`;
+               tabela.innerHTML += row;
+            });
+    
+
+        });
+    }
 
 
 });
