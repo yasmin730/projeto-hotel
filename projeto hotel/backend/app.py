@@ -157,6 +157,32 @@ def buscar_clientes():
             500,
         )
 
+@app.route("/cliente/<int:cliente_id>", methotds=["get"])
+def get_cliente(cliente_id):
+    """
+    retorna os dados completos de um cliente pelo seu ID
+    """
+    try:
+        workbook = openpyxl.load_worbook(EXCEL_FILE)
+        sheet = worbook.active
+
+        #procura o cliente linha por linha
+        for row_idx in range(2,sheet.max_row + 1):
+            row_id = sheet.cell(row=row_idx, column=1).value
+            if row_id == cliente_id:
+                row_values = [cell.value for cell in sheet[row_id]]
+                cliente = dict(zip(COLUMNS, row_values))
+                return jsonify(cliente)
+
+        # se não encontrar o ID
+        return jsonify({"status": "error", "mensage": "Cliente não encontrado."}), 404
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "mensage:": f"Erro ao buscar clente: {e}"}),
+           500,
+        )       
+
+
 
 
 
