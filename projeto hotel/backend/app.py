@@ -157,7 +157,7 @@ def buscar_clientes():
             500,
         )
 
-@app.route("/cliente/<int:cliente_id>", methotds=["get"])
+@app.route("/cliente/<int:cliente_id>", methods=["GET"])
 def get_cliente(cliente_id):
     """
     retorna os dados completos de um cliente pelo seu ID
@@ -178,7 +178,7 @@ def get_cliente(cliente_id):
         return jsonify({"status": "error", "mensage": "Cliente não encontrado."}), 404
     except Exception as e:
         return (
-            jsonify({"status": "error", "mensage:": f"Erro ao buscar clente: {e}"}),
+            jsonify({"status": "error", "mensage:": f"Erro ao buscar cliente: {e}"}),
            500,
         )       
 
