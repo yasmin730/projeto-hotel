@@ -88,5 +88,28 @@ Document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    formAlterar.addEventListener('submit', async (e) =>{
+       e.preventDefault();
+
+       const dados = {
+        nome: nome.value,
+        cpf: cpf.value,
+        email: email.value,
+        telefone: telefone.value,
+        endereco: endereco.value,
+        observacoes: observacoes.value,
+       }
+       // envia para o backup
+       const resp = await fetch(`/api/atualizar/${id}`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json'},
+          body: JSON.stringify(dados)
+       });
+
+       const result = await resp.json();
+       mensagem.ineerText = result.message; // mostra o retorno na tela
+
+    });
+
 
 });
