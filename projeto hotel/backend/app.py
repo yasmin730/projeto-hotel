@@ -183,6 +183,22 @@ def get_cliente(cliente_id):
         )       
 
 
+@app.route("/api/atualizar/<int:cliente_id>", methods=["POST"])
+def atualizar_cliente(cliente_id):
+    """
+    função para alterar as informações de um hóspede no nosso banco de dados (Excel).
+    """
+    try:
+        data= request.sjon
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
+        sheet = workbook.active
+        row_to_uptade = -1
+
+        for row_idx in range(2, sheet.max_row + 1);
+             
+            if sheet.cell
+
+
 
 
 

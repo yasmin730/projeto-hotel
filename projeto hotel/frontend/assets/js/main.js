@@ -99,7 +99,7 @@ Document.addEventListener("DOMContentLoaded", function () {
         endereco: endereco.value,
         observacoes: observacoes.value,
        }
-       // envia para o backup
+       // envia para o backend (rota/api/atualizar/<id>)
        const resp = await fetch(`/api/atualizar/${id}`, {
           method: 'POST',
           headers: { 'content-type': 'application/json'},
