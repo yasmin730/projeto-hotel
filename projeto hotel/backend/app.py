@@ -35,95 +35,112 @@ COLUMNS = [
      "Data Cadastro",
 ]
 
+# =============================================================================
+# 🛠 FUNÇÃO AUXILIAR: CRIA O ARQUIVO EXCEL CASO NÃO EXISTA
+# =============================================================================
+# 💡 Essa função garante que o sistema funcione mesmo na primeira execução.
+#    Se a pasta 'db' ou o arquivo 'clientes.xlsx' não existirem, eles são criados.
+# =============================================================================
 def init_excel():
-      if not os.path.exists(DB_DIR):
-          os.makedrs(DB_DIR) #cria uma nova planilha Excel
-      if not os.path.exists(EXCEL_FILE):
-          worbook = openpyxl.worbook()
-          sheet = worbook.active
-          sheet.title = "Clientes"
-          sheet.append(COLUMNS)
-          worbook.save(EXCEL_FILE)     
+     if not os.path.exists(DB_DIR):
+        os.makedrs(DB_DIR) #cria uma nova planilha Excel
+
+    if not os.path.exists(EXCEL_FILE):
+        worbook = openpyxl.worbook()
+        sheet = worbook.active
+        sheet.title = "Clientes"
+        sheet.append(COLUMNS)
+        worbook.save(EXCEL_FILE)     
               
 
 app = Flask(__name__, static_folder=STATIC_DIR,static_url_path="/" + STATIC_DIR)
 
+# =========================
+# ROTA PRINCIPAL (HTML)
+# ROTAS DAS PÁGINAS (FRONTEND)
+# Página inicial (Cadastro/index.html)
+# =========================
 @app.route("/")
 def home():
-     return send_from_directory(FRONTEND_DIR, "index.html")
+    return send_from_directory(FRONTEND_DIR, "index.html")
 
 # Página de consulta
 @app.route("/consulta")
 def consulta_page():
-     return send_from_directory(FRONTEND_DIR, "consulta.html")
+    return send_from_directory(FRONTEND_DIR, "consulta.html")
 
 # Página de Alteração
 @app.route("/alterar")
 def alterar_page():
-     return send_from_directory(FRONTEND_DIR, "alterar.html")
+    return send_from_directory(FRONTEND_DIR, "alterar.html")
 
 @app.route("/assets/<path:filename>")
 def assets(filename):
     return send_from_directory("../frontend/assets", filename)
 
+
 @app.route("/cadastrar", methods=["post"])
 def cadastrar_cliente():
 
      try:
-          data = request.json
-          required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
-          if not all(field in data and data[field] for field in required_fields):
-             return (
-                 jsonify(
-                     {
-                         "status": "error",
-                         "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
-                   }
-               ),
-               400,
-          )
-          worbook = openpyxl.load_worbook(EXCEL_FILE)
-          sheet = worbook.active
-
-          last_id = 0
-          if sheet.max_row > 1:
-               last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
-          new_id = last_id + 1
-
-          novo_cliente = [
-             new_id,
-             data.get("nome"),
-             data.get("cpf"),
-             data.get("email"),
-             data.get("telefone"),
-             data.get("endereco"),
-             data.get("observacoes", ""),
-            datetime.now().strftime("%Y-%m-%d"),
-          ]  
-
-          sheet.append(novo_cliente)
-          worbook.save(EXCEL_FILE)
-
-          return (
+        data = request.json # 📨 Dados enviados do frontend via POST (JSON)
+        # ⚙️ Campos obrigatórios que o usuário deve preencher
+        required_fields = ["nome", "cpf", "email", "telefone", "endereço"]
+        if not all(field in data and data[field] for field in required_fields):
+            return (
                 jsonify(
-                     {
-                        "status": "sucess",
-                       "mensage": "clientes cadastrado com sucesso!",
-                       "id": new_id,
+                    {
+                        "status": "error",
+                        "mensagem": "Todos os campos obrigatórios devem ser preenchidos.",
                     }
                ),
-              201,
-          )
+               400,
+            )
+        worbook = openpyxl.load_worbook(EXCEL_FILE)  # 📂 Abre o arquivo Excel
+        sheet = worbook.active
+        # 🧮 Cria um ID automático (último ID + 1)
+        last_id = 0
+        if sheet.max_row > 1:
+          last_id = sheet.cell(row=sheet.max_row, column=1). value or 0
+        new_id = last_id + 1
 
-     except Exception as e:
-           return(
-              jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"}),
-              500, 
-          )  
+        # 🧾 Cria uma nova linha com os dados informados
+        novo_cliente = [   
+            new_id,
+            data.get("nome"),
+            data.get("cpf"),
+            data.get("email"),
+            data.get("telefone"),
+            data.get("endereco"),
+            data.get("observacoes", ""),
+            datetime.now().strftime("%Y-%m-%d"),
+       ]  
+        sheet.append(novo_cliente) # Adiciona nova linha no Excel
+        worbook.save(EXCEL_FILE) # 💾 Salva alterações
+        # ✅ Retorna mensagem de sucesso
+        return (
+            jsonify(
+                {
+                    "status": "sucess",
+                    "mensage": "clientes cadastrado com sucesso!",
+                    "id": new_id,
+                }
+            ),
+            201,
+        )
+
+    except Exception as e:
+        #⚠️ Tratamento de erro genérico
+        return(
+            jsonify({"status": "error", "mensage": f"erro ao salvar no servidor: {e}"}),
+            500, 
+        )  
 
 
 
-
+# -------------------------------------------------------------------------
+# 🔍 CONSULTAR CLIENTES por nome
+# -------------------------------------------------------------------------
 @app.route("/api/buscar", methods=["GET"])
 def buscar_clientes():
     """
@@ -157,6 +174,9 @@ def buscar_clientes():
             500,
         )
 
+# -------------------------------------------------------------------------
+# 📋 CONSULTAR CLIENTE POR ID
+# -------------------------------------------------------------------------
 @app.route("/cliente/<int:cliente_id>", methods=["GET"])
 def get_cliente(cliente_id):
     """
@@ -179,31 +199,71 @@ def get_cliente(cliente_id):
     except Exception as e:
         return (
             jsonify({"status": "error", "mensage:": f"Erro ao buscar cliente: {e}"}),
-           500,
+            500,
         )       
 
-
+# -------------------------------------------------------------------------
+# ✏️ ATUALIZAR DADOS DE UM CLIENTE
+# -------------------------------------------------------------------------
+# 1. Definimos o "endereço" (rota) onde o navegador ou app deve bater para atualizar um cliente.
+# O <int:cliente_id> é o número único do hóspede que queremos encontrar.
+# POST indica que estamos enviando novos dados para o servidor.
 @app.route("/api/atualizar/<int:cliente_id>", methods=["POST"])
 def atualizar_cliente(cliente_id):
     """
     função para alterar as informações de um hóspede no nosso banco de dados (Excel).
     """
     try:
+        # Pega o "pacote de dados" (JSON - JavaScript Object Notation) que veio da internet.
+        # Nele estão o novo nome, telefone, etc., que o usuário digitou no site.
         data= request.sjon
+
+        # Abre o nosso arquivo Excel (que funciona como o cérebro do hotel para guardar dados).
         workbook = openpyxl.load_workbook(EXCEL_FILE)
+
+        # Seleciona a página que está aberta/ativa no momento dentro do arquivo
         sheet = workbook.active
+
         row_to_uptade = -1
 
-        for row_idx in range(2, sheet.max_row + 1);
+        for row_idx in range(2, sheet.max_row + 1):
              
-            if sheet.cell
+            if sheet.cell(row=row_idx, column=1).value == cliente_id:
+                row_to_uptade = row_idx
+                break
+
+        if row_to_uptade == -1:
+            return (
+                jsonify({
+                    "status": "error",
+                    "message": "cliente não encontrado para atualização",
+                }),
+                404, #código de erro padrão para "não encontrado".
+            )    
+        # 🧾 ESCRITA: Agora o sistema escreve as novas informações nas colunas certas daquela linha.
+        # Column 2 = Nome, Column 3 = CPF, e assim por diante    
+        sheet.cell(row=row_to_uptade, column=2, value=data.get("nome"))
+        sheet.cell(row=row_to_uptade, column=3, value=data.get("cpf"))
+        sheet.cell(row=row_to_uptade, column=4, value=data.get("email"))
+        sheet.cell(row=row_to_uptade, column=5, value=data.get("telefone"))
+        sheet.cell(row=row_to_uptade, column=6, value=data.get("endereco"))
+        sheet.cell(row=row_to_uptade, column=7, value=data.get("observacoes"))
+
+        workbook.save(EXCEL_FILE)
 
 
-
-
-
-  
-
+        return jsonify(
+            {
+             "status": "sucess",
+              "message": "Dados do cliente atualizados com sussesso!",
+            }
+        )
+    
+    except exception as e:
+        return(
+            jsonify({"status": "error", "message": f"Erro ao atualizar dados: {e}"}),
+            500,
+        )
 
 
 if __name__ == "__name__":
