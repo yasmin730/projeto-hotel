@@ -4,6 +4,13 @@
     <meta charset="UTF-8">         
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!--RESPONSABILIDADE DO SITE-->
     <title>cadastro de clientes</title>
+    
+    <link href="https://cdn.jsdelivr.net/bootstrap@5.3.0/dist/css/bootstrap.min.css" rell="stylesheet">
+
+    <link rell="stylesheet" href="/static/css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
     <style>
         /* Apenas um estilo básico para organizar */
         div { margin-bottom: 15px; }
@@ -12,13 +19,29 @@
     </style>
 </head>
 <body>
+    <header>
+        <div id="carouselExampleIndicados" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <!-- Primeira imagem(ativa por padrão)-->
+                <div class="carousel-item active">
+                    <img src="assets/images/banner1.png" class="d-block w-100" alt="banner 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="assets/images/banner2.png" class="d-block w-100" alt="banner 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="assets/images/banner3.png" class="d-block w-100" alt="banner 3">
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <nav>
-        <div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient">
+        <div class="container-fluid">
           <!-- Logotipo / Nome de hotel -->
-           <a href="/"> Hotel Villa Vistosa</a>
+           <a class="navbar-brand fw-bold text-white" href="/"> Hotel Villa Vistosa</a>
            <!-- Botão que aparece em telas pequenas-->
-            <button type="button">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span></span>
              </button>
              <!-- Intens de navegação-->
@@ -33,9 +56,12 @@
                         <a href="/consulta">🔍 Consultar</a>
                     </li>
                 </ul>
-              </div>
+            </div>
         </div>
     </nav>
+   
+   
+    
    <form id="cadastro">
     <div>
         <div>
@@ -73,10 +99,20 @@
             <input type="text" name="observacao" required>
         </div>
     </div>
+  
 
-
-    <button type="submit">Cadastrar</button>
+    <button type="submit" class="btn-primary">Cadastrar</button>
    </form>
-<scipt src="assets/js/main.js"></scipt>
+
+   <div id="mensagem"></div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+   <scipt src="assets/js/main.js"></scipt>
+
+   <footer class="text-center mt-5 p-3 text-white bg-dark">
+      <p> Sistema de Cadastro | Desenvolvido para fins didáticos</p>
+   </footer>
+
 </body>
 </html>
